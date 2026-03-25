@@ -1,216 +1,316 @@
-const palette = [
-  ['Background', 'bg', '#060B14', 'bg-bg'],
-  ['Surface', 'surface', '#0E1624', 'bg-surface'],
-  ['Elevated', 'elevated', '#131D30', 'bg-elevated'],
-  ['Border', 'border', '#22314D', 'bg-border'],
-  ['Primary', 'primary', '#2F7DFF', 'bg-primary'],
-  ['Secondary', 'secondary', '#23C6D8', 'bg-secondary'],
-  ['Success', 'success', '#3CCB7F', 'bg-success'],
-  ['Warning', 'warning', '#F0B94B', 'bg-warning'],
-  ['Danger', 'danger', '#EF5F77', 'bg-danger']
+import { useEffect, useMemo, useState } from 'react';
+import { Button } from './components/ui/button';
+import { Card } from './components/ui/card';
+import { Input } from './components/ui/input';
+
+const navLinks = [
+  { label: 'Features', href: '#features' },
+  { label: 'How It Works', href: '#how-it-works' },
+  { label: 'Pricing', href: '#pricing' },
+  { label: 'Early Access', href: '#early-access' }
 ];
 
-function GuardLayerIcon({ className = 'h-10 w-10' }) {
-  return (
-    <svg viewBox="0 0 64 64" className={className} fill="none" aria-label="GuardLayer icon">
-      <defs>
-        <linearGradient id="guardGrad" x1="12" y1="10" x2="52" y2="54" gradientUnits="userSpaceOnUse">
-          <stop stopColor="#2F7DFF" />
-          <stop offset="1" stopColor="#23C6D8" />
-        </linearGradient>
-      </defs>
-      <rect x="8" y="8" width="48" height="48" rx="14" fill="#0E1624" stroke="#22314D" />
-      <path d="M20 37.5C20 29.5 25.9 23 33.7 22.1" stroke="url(#guardGrad)" strokeWidth="4" strokeLinecap="round" />
-      <path d="M24.5 42.8C32.8 46.7 43.2 43.2 47.2 34.9" stroke="#23C6D8" strokeOpacity="0.5" strokeWidth="3" strokeLinecap="round" />
-      <circle cx="39.5" cy="26.5" r="4" fill="#2F7DFF" />
-    </svg>
-  );
-}
+const problemItems = [
+  'Malware injected silently',
+  'Admin users created by attackers',
+  'Plugin vulnerabilities exploited',
+  'SEO spam injected',
+  'File changes unnoticed',
+  'Suspicious logins ignored'
+];
 
-function Wordmark() {
-  return (
-    <div className="flex items-center gap-3">
-      <GuardLayerIcon className="h-9 w-9" />
-      <span className="font-display text-2xl font-semibold tracking-tight text-text-primary">
-        Guard<span className="text-secondary">Layer</span>
-      </span>
-    </div>
-  );
-}
+const steps = [
+  {
+    title: 'Connect your website',
+    desc: 'Install the WordPress plugin or connect via API in minutes.'
+  },
+  {
+    title: 'AI agents monitor everything',
+    desc: 'Track logins, vulnerabilities, traffic anomalies, and file changes continuously.'
+  },
+  {
+    title: 'Get alerts instantly',
+    desc: 'Receive alerts in dashboard + email today, with more integrations coming soon.'
+  }
+];
 
-function Section({ title, children, subtitle }) {
+const agents = [
+  'Login Attack Agent',
+  'Vulnerability Scanner Agent',
+  'File Integrity Agent',
+  'Malware Detection Agent',
+  'Admin User Monitor',
+  'Traffic Anomaly Agent'
+];
+
+const features = [
+  ['Real-Time Threat Detection', 'Catch attacks early with continuous monitoring and fast triage.'],
+  ['Plugin Vulnerability Alerts', 'Track plugin CVEs and high-risk versions before exploitation.'],
+  ['File Change Monitoring', 'Detect unauthorized file edits and suspicious code injections quickly.'],
+  ['Suspicious Login Detection', 'Identify brute force, credential stuffing, and unusual sign-in behavior.'],
+  ['Website Risk Score', 'Understand your website security posture with one clear score.'],
+  ['AI Security Reports', 'Get concise summaries with actionable remediation suggestions.']
+];
+
+function Section({ id, title, subtitle, children }) {
   return (
-    <section className="panel p-6 md:p-8">
-      <h2 className="font-display text-2xl font-semibold text-text-primary">{title}</h2>
-      {subtitle ? <p className="mt-2 max-w-3xl text-sm text-text-secondary">{subtitle}</p> : null}
-      <div className="mt-6">{children}</div>
+    <section id={id} className="scroll-mt-24 reveal space-y-5 py-16 md:py-20">
+      <div className="space-y-3">
+        <h2 className="font-display text-3xl font-semibold text-text-primary md:text-4xl">{title}</h2>
+        {subtitle ? <p className="max-w-3xl text-text-secondary">{subtitle}</p> : null}
+      </div>
+      {children}
     </section>
   );
 }
 
-export default function App() {
+function Navbar() {
+  const [open, setOpen] = useState(false);
+  const [scrolled, setScrolled] = useState(false);
+
+  useEffect(() => {
+    const handleScroll = () => setScrolled(window.scrollY > 8);
+    handleScroll();
+    window.addEventListener('scroll', handleScroll);
+    return () => window.removeEventListener('scroll', handleScroll);
+  }, []);
+
   return (
-    <main className="mx-auto flex min-h-screen w-full max-w-7xl flex-col gap-6 px-4 py-8 md:px-8 md:py-10">
-      <section className="panel overflow-hidden p-8 md:p-12">
-        <div className="absolute" />
-        <Wordmark />
-        <p className="mt-5 max-w-3xl text-text-secondary">
-          A premium, dark-first brand system for an AI-powered website security platform. The identity centers on
-          layered detection, perimeter intelligence, and calm enterprise trust rather than loud cybersecurity clichés.
-        </p>
-        <div className="mt-6 flex flex-wrap gap-3">
-          <span className="badge">Modern</span>
-          <span className="badge">Protective</span>
-          <span className="badge">Enterprise-capable</span>
-          <span className="badge">Startup-polished</span>
-        </div>
-      </section>
+    <header
+      className={`sticky top-0 z-50 border-b backdrop-blur transition ${
+        scrolled ? 'border-border/80 bg-surface/90' : 'border-transparent bg-bg/30'
+      }`}
+    >
+      <nav className="mx-auto flex h-[4.5rem] w-full max-w-7xl items-center justify-between px-4 md:px-8">
+        <a href="#" className="font-display text-2xl font-semibold tracking-tight text-text-primary">
+          Guard<span className="text-secondary">Layer</span>
+        </a>
 
-      <Section
-        title="1) Logo concept direction"
-        subtitle="Icon: abstract detection arcs + node over a protected surface. Wordmark: Inter/Sora blend with a subtle two-tone Layer emphasis."
-      >
-        <div className="grid gap-5 md:grid-cols-3">
-          <div className="panel p-5">
-            <p className="text-xs uppercase tracking-[0.15em] text-text-muted">Navbar / wordmark</p>
-            <div className="mt-3">
-              <Wordmark />
-            </div>
-          </div>
-          <div className="panel p-5">
-            <p className="text-xs uppercase tracking-[0.15em] text-text-muted">Favicon / app icon</p>
-            <div className="mt-3 flex h-16 w-16 items-center justify-center rounded-2xl border border-border bg-bg">
-              <GuardLayerIcon className="h-12 w-12" />
-            </div>
-          </div>
-          <div className="panel p-5">
-            <p className="text-xs uppercase tracking-[0.15em] text-text-muted">Monochrome check</p>
-            <div className="mt-3 flex h-16 w-16 items-center justify-center rounded-2xl border border-border bg-bg">
-              <svg viewBox="0 0 64 64" className="h-12 w-12" fill="none">
-                <rect x="8" y="8" width="48" height="48" rx="14" fill="#111827" stroke="#6B7280" />
-                <path d="M20 37.5C20 29.5 25.9 23 33.7 22.1" stroke="#E5E7EB" strokeWidth="4" strokeLinecap="round" />
-                <path d="M24.5 42.8C32.8 46.7 43.2 43.2 47.2 34.9" stroke="#9CA3AF" strokeWidth="3" strokeLinecap="round" />
-                <circle cx="39.5" cy="26.5" r="4" fill="#E5E7EB" />
-              </svg>
-            </div>
+        <div className="hidden items-center gap-8 md:flex">
+          {navLinks.map((item) => (
+            <a key={item.href} href={item.href} className="text-sm text-text-secondary transition hover:text-text-primary">
+              {item.label}
+            </a>
+          ))}
+          <a href="#early-access">
+            <Button>Join Early Access</Button>
+          </a>
+        </div>
+
+        <Button className="md:hidden h-10 px-3" variant="secondary" onClick={() => setOpen(!open)}>
+          Menu
+        </Button>
+      </nav>
+      {open ? (
+        <div className="border-b border-border bg-surface/95 px-4 py-4 md:hidden">
+          <div className="mx-auto flex max-w-7xl flex-col gap-3">
+            {navLinks.map((item) => (
+              <a key={item.href} href={item.href} className="text-sm text-text-secondary" onClick={() => setOpen(false)}>
+                {item.label}
+              </a>
+            ))}
+            <Button onClick={() => setOpen(false)}>Join Early Access</Button>
           </div>
         </div>
-      </Section>
+      ) : null}
+    </header>
+  );
+}
 
-      <Section title="2) Color palette" subtitle="Dark-first, premium contrast with controlled accent energy.">
-        <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
-          {palette.map(([name, token, hex, swatchClass]) => (
-            <div key={token} className="rounded-xl border border-border bg-elevated p-4">
-              <div className={`h-16 rounded-lg ${swatchClass}`} />
-              <p className="mt-3 text-sm font-semibold text-text-primary">{name}</p>
-              <p className="text-xs text-text-secondary">{token}</p>
-              <p className="font-mono text-xs text-text-muted">{hex}</p>
+function DashboardMock() {
+  const metrics = useMemo(
+    () => [
+      ['Threats blocked', '128', 'text-success'],
+      ['Suspicious logins', '19', 'text-warning'],
+      ['Vulnerability alerts', '7', 'text-secondary'],
+      ['File integrity changes', '3', 'text-danger']
+    ],
+    []
+  );
+
+  return (
+    <Card className="relative overflow-hidden border-primary/30 bg-gradient-to-b from-primary/10 to-surface p-6 shadow-glow">
+      <div className="absolute -right-12 -top-16 h-40 w-40 rounded-full bg-secondary/20 blur-3xl" />
+      <div className="absolute -bottom-16 -left-10 h-36 w-36 rounded-full bg-primary/20 blur-3xl" />
+      <div className="relative space-y-4">
+        <div className="flex items-center justify-between">
+          <p className="text-sm text-text-secondary">Live Security Panel</p>
+          <span className="rounded-full border border-success/40 bg-success/10 px-3 py-1 text-xs text-success">Protected</span>
+        </div>
+        <div className="grid grid-cols-2 gap-3">
+          {metrics.map(([label, value, tone]) => (
+            <div key={label} className="rounded-xl border border-border bg-bg/70 p-3 transition hover:border-secondary/60">
+              <p className="text-xs text-text-muted">{label}</p>
+              <p className={`mt-2 text-2xl font-semibold ${tone}`}>{value}</p>
             </div>
           ))}
         </div>
-      </Section>
-
-      <Section title="3) Typography direction" subtitle="Sora for confident headlines, Inter for product clarity and dense UI legibility.">
-        <div className="space-y-4">
-          <h1 className="font-display text-4xl font-semibold text-text-primary">GuardLayer secures the edge before breaches begin.</h1>
-          <p className="max-w-4xl text-base leading-relaxed text-text-secondary">
-            Inter is the default for body, dashboard widgets, forms, and docs because it performs well at small sizes. Use
-            Sora for hero headlines, section titles, pricing headings, and short high-impact statements.
-          </p>
-          <p className="font-mono text-sm text-secondary">MONITOR • DETECT • VERIFY • RESPOND</p>
+        <div className="rounded-xl border border-border bg-bg/60 p-4">
+          <p className="text-xs text-text-muted">Website Risk Score</p>
+          <div className="mt-2 h-2 rounded-full bg-elevated">
+            <div className="h-full w-[86%] rounded-full bg-gradient-to-r from-success to-secondary" />
+          </div>
+          <p className="mt-2 text-sm text-text-secondary">86 / 100 — strong posture, 2 actions recommended.</p>
         </div>
-      </Section>
-
-      <Section
-        title="4) UI style guidance"
-        subtitle="Rounded-xl/2xl surfaces, thin structured borders, selective glows on primary actions, restrained motion with 150–220ms ease-out transitions."
-      >
-        <div className="grid gap-4 lg:grid-cols-2">
-          <div className="space-y-3 rounded-xl border border-border bg-elevated p-4">
-            <p className="text-sm font-semibold text-text-primary">Buttons & Tags</p>
-            <div className="flex flex-wrap gap-3">
-              <button className="btn-primary">Run Security Scan</button>
-              <button className="btn-secondary">View Rules</button>
-              <span className="badge border-success/40 text-success">Secure</span>
-              <span className="badge border-warning/40 text-warning">Needs Review</span>
-            </div>
-          </div>
-          <div className="space-y-3 rounded-xl border border-border bg-elevated p-4">
-            <p className="text-sm font-semibold text-text-primary">Input / Form</p>
-            <label className="text-xs text-text-muted">Website URL</label>
-            <input
-              className="w-full rounded-xl border border-border bg-bg px-3 py-2 text-sm text-text-primary outline-none ring-0 transition focus:border-ring focus:ring-2 focus:ring-ring/30"
-              defaultValue="https://example.com"
-            />
-          </div>
-        </div>
-      </Section>
-
-      <div className="grid gap-6 lg:grid-cols-2">
-        <Section title="5) Dashboard card preview" subtitle="Security posture snapshot card for app + plugin surfaces.">
-          <div className="space-y-4 rounded-2xl border border-border bg-elevated p-5">
-            <div className="flex items-center justify-between">
-              <h3 className="font-display text-lg text-text-primary">Threat Overview</h3>
-              <span className="badge border-success/40 text-success">Protected</span>
-            </div>
-            <div className="grid grid-cols-3 gap-3">
-              {[
-                ['Critical', '0', 'text-success'],
-                ['Warnings', '3', 'text-warning'],
-                ['Events', '27', 'text-secondary']
-              ].map(([label, value, tone]) => (
-                <div key={label} className="rounded-xl border border-border bg-bg p-3">
-                  <p className="text-xs text-text-muted">{label}</p>
-                  <p className={`mt-1 text-xl font-semibold ${tone}`}>{value}</p>
-                </div>
-              ))}
-            </div>
-          </div>
-        </Section>
-
-        <Section title="6) Pricing card preview" subtitle="Premium but readable conversion design for landing pages.">
-          <div className="rounded-2xl border border-primary/40 bg-gradient-to-b from-primary/15 to-elevated p-5 shadow-glow">
-            <p className="text-sm font-semibold text-secondary">GuardLayer Pro</p>
-            <p className="mt-2 font-display text-4xl text-text-primary">$29<span className="text-base text-text-secondary">/mo</span></p>
-            <ul className="mt-4 space-y-2 text-sm text-text-secondary">
-              <li>• AI vulnerability monitoring</li>
-              <li>• Malware + file change detection</li>
-              <li>• Suspicious login alerts</li>
-              <li>• Weekly security posture reports</li>
-            </ul>
-            <button className="btn-primary mt-5 w-full">Start 14-day trial</button>
-          </div>
-        </Section>
       </div>
-
-      <Section
-        title="7) Brand usage ideas + Tailwind tokens"
-        subtitle="System scales across navbar, sidebar, social avatars, plugin icon, docs and security report covers."
-      >
-        <div className="grid gap-4 lg:grid-cols-2">
-          <div className="rounded-xl border border-border bg-elevated p-4 text-sm text-text-secondary">
-            <p className="font-semibold text-text-primary">Usage map</p>
-            <ul className="mt-2 space-y-1">
-              <li>• Navbar: full wordmark on dark transparent header.</li>
-              <li>• Sidebar: icon mark + text collapsed at narrow widths.</li>
-              <li>• Plugin icon: square glyph with strong inner contrast.</li>
-              <li>• Social avatar: icon-only, deep background, cyan node.</li>
-              <li>• PDF reports: large watermark icon + Sora title + Inter body.</li>
-            </ul>
-          </div>
-          <pre className="overflow-x-auto rounded-xl border border-border bg-bg p-4 text-xs text-text-secondary">
-{`// tailwind token mapping
-colors: {
-  bg: '#060B14', surface: '#0E1624', elevated: '#131D30', border: '#22314D',
-  primary: '#2F7DFF', secondary: '#23C6D8',
-  success: '#3CCB7F', warning: '#F0B94B', danger: '#EF5F77', ring: '#58A6FF',
-  text: { primary: '#EAF2FF', secondary: '#A8B8D8', muted: '#7E8DA9' }
+    </Card>
+  );
 }
-// primary button: bg-primary border-primary/70 text-white hover:brightness-110
-// secondary button: bg-elevated border-border text-text-primary hover:text-secondary`}
-          </pre>
+
+export default function App() {
+  const [submitted, setSubmitted] = useState(false);
+
+  return (
+    <div className="min-h-screen bg-bg text-text-primary">
+      <Navbar />
+      <main className="mx-auto w-full max-w-7xl px-4 md:px-8">
+        <section className="grid scroll-mt-24 items-center gap-12 py-16 md:grid-cols-2 md:py-20" id="hero">
+          <div className="reveal space-y-6">
+            <span className="badge">AI-Powered Website Security</span>
+            <h1 className="font-display text-4xl font-semibold leading-tight md:text-6xl">
+              AI Security Agents Watching Your Website 24/7
+            </h1>
+            <p className="max-w-xl text-lg text-text-secondary">
+              GuardLayer continuously monitors your website for vulnerabilities, suspicious activity, malware, and
+              attacks — before they become breaches.
+            </p>
+            <div className="flex flex-wrap gap-3">
+              <Button size="lg">Join Early Access</Button>
+              <Button size="lg" variant="secondary" disabled>
+                View Demo · Coming Soon
+              </Button>
+            </div>
+            <p className="text-sm text-text-muted">Works with WordPress first. Expanding beyond WordPress.</p>
+          </div>
+          <div className="reveal delay-150">
+            <DashboardMock />
+          </div>
+        </section>
+
+        <Section
+          title="Most Websites Are Compromised Without You Knowing"
+          subtitle="GuardLayer automatically detects hidden compromise patterns and alerts you before minor incidents turn into breaches."
+        >
+          <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-3">
+            {problemItems.map((item) => (
+              <Card key={item} className="p-5 transition hover:-translate-y-1 hover:border-secondary/70 hover:bg-elevated/90">
+                <p className="text-base text-text-secondary">{item}</p>
+              </Card>
+            ))}
+          </div>
+        </Section>
+
+        <Section id="how-it-works" title="How GuardLayer Works">
+          <div className="grid gap-5 md:grid-cols-3">
+            {steps.map((step, idx) => (
+              <Card key={step.title} className="relative p-6">
+                <span className="mb-3 inline-flex h-10 w-10 items-center justify-center rounded-full border border-secondary/50 bg-secondary/10 font-semibold text-secondary">
+                  {idx + 1}
+                </span>
+                <h3 className="text-lg font-semibold">{step.title}</h3>
+                <p className="mt-2 text-text-secondary">{step.desc}</p>
+              </Card>
+            ))}
+          </div>
+        </Section>
+
+        <Section
+          title="Powered by Autonomous Security Agents"
+          subtitle="Every website gets specialized AI-driven monitoring agents that continuously detect anomalies, risks, and suspicious activity."
+        >
+          <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
+            {agents.map((agent) => (
+              <Card key={agent} className="group p-5 transition hover:border-primary/60 hover:shadow-glow">
+                <p className="font-medium text-text-primary transition group-hover:text-secondary">{agent}</p>
+              </Card>
+            ))}
+          </div>
+        </Section>
+
+        <Section id="features" title="Everything You Need to Stay Ahead of Threats">
+          <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-3">
+            {features.map(([title, desc]) => (
+              <Card key={title} className="p-6 transition hover:border-secondary/60">
+                <h3 className="text-lg font-semibold">{title}</h3>
+                <p className="mt-2 text-text-secondary">{desc}</p>
+              </Card>
+            ))}
+          </div>
+        </Section>
+
+        <Section id="pricing" title="Simple Pricing for Smarter Website Security">
+          <div className="grid gap-5 md:grid-cols-2">
+            <Card className="p-6">
+              <p className="text-sm text-text-muted">Free</p>
+              <p className="mt-2 font-display text-4xl font-semibold">$0</p>
+              <ul className="mt-4 space-y-2 text-text-secondary">
+                <li>• 1 website</li>
+                <li>• Basic monitoring</li>
+                <li>• Login alerts</li>
+                <li>• Weekly scans</li>
+                <li>• Website risk score</li>
+              </ul>
+              <Button className="mt-6 w-full" variant="secondary">
+                Join Free Waitlist
+              </Button>
+            </Card>
+            <Card className="border-primary/50 bg-gradient-to-b from-primary/10 to-surface p-6 shadow-glow">
+              <p className="text-sm text-secondary">Pro</p>
+              <p className="mt-2 font-display text-4xl font-semibold">Early Access</p>
+              <ul className="mt-4 space-y-2 text-text-secondary">
+                <li>• Multiple websites</li>
+                <li>• Real-time monitoring</li>
+                <li>• All AI agents</li>
+                <li>• Malware detection</li>
+                <li>• File change alerts</li>
+                <li>• Priority scans + advanced reporting</li>
+              </ul>
+              <Button className="mt-6 w-full">Request Pro Access</Button>
+            </Card>
+          </div>
+          <p className="text-sm text-text-muted">Early access pricing available. Public pricing launches soon.</p>
+        </Section>
+
+        <Section
+          id="early-access"
+          title="Be First to Secure Your Website"
+          subtitle="Join early access to get launch updates, early feature access, and limited free Pro onboarding."
+        >
+          <Card className="border-secondary/30 bg-gradient-to-br from-surface to-elevated p-6 md:p-8">
+            <form
+              className="grid gap-4 md:grid-cols-[1fr_1fr_auto]"
+              onSubmit={(event) => {
+                event.preventDefault();
+                setSubmitted(true);
+              }}
+            >
+              <Input type="email" placeholder="Email" required />
+              <Input type="url" placeholder="Website URL (optional)" />
+              <Button className="md:self-stretch" type="submit">
+                Join Early Access
+              </Button>
+            </form>
+            {submitted ? (
+              <p className="mt-4 text-sm text-success">Thanks! You’re on the GuardLayer early-access list.</p>
+            ) : null}
+          </Card>
+        </Section>
+      </main>
+
+      <footer className="border-t border-border/80 py-10">
+        <div className="mx-auto flex w-full max-w-7xl flex-col gap-5 px-4 md:flex-row md:items-center md:justify-between md:px-8">
+          <div>
+            <p className="font-display text-2xl font-semibold">Guard<span className="text-secondary">Layer</span></p>
+            <p className="mt-2 text-sm text-text-secondary">AI-powered website security platform for proactive threat defense.</p>
+            <p className="mt-2 text-xs text-text-muted">© {new Date().getFullYear()} GuardLayer. All rights reserved.</p>
+          </div>
+          <div className="flex gap-5 text-sm text-text-secondary">
+            <a href="#" className="hover:text-text-primary">Privacy</a>
+            <a href="#" className="hover:text-text-primary">Terms</a>
+            <a href="#" className="hover:text-text-primary">Contact</a>
+          </div>
         </div>
-      </Section>
-    </main>
+      </footer>
+    </div>
   );
 }
