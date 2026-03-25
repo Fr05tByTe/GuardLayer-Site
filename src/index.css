@@ -1,0 +1,36 @@
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=Sora:wght@500;600;700&display=swap');
+
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@layer base {
+  * {
+    @apply border-border;
+  }
+
+  body {
+    background-image:
+      radial-gradient(circle at 12% 15%, rgba(47, 125, 255, 0.15), transparent 30%),
+      radial-gradient(circle at 86% 10%, rgba(35, 198, 216, 0.12), transparent 26%),
+      linear-gradient(180deg, #060b14 0%, #050a13 100%);
+  }
+}
+
+@layer components {
+  .panel {
+    @apply rounded-2xl border border-border bg-surface/90 shadow-panel backdrop-blur;
+  }
+
+  .btn-primary {
+    @apply inline-flex items-center justify-center rounded-xl border border-primary/70 bg-primary px-4 py-2 text-sm font-semibold text-white shadow-glow transition hover:brightness-110;
+  }
+
+  .btn-secondary {
+    @apply inline-flex items-center justify-center rounded-xl border border-border bg-elevated px-4 py-2 text-sm font-semibold text-text-primary transition hover:border-secondary/60 hover:text-secondary;
+  }
+
+  .badge {
+    @apply inline-flex items-center gap-2 rounded-full border border-border bg-elevated px-3 py-1 text-xs font-medium text-text-secondary;
+  }
+}
