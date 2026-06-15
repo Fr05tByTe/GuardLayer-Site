@@ -25,3 +25,10 @@ def test_ssl_expiring_in_32_days(): assert web.ssl_result(32).status == 'warning
 
 def test_http_403_wording():
     assert 403 in web.scan_web.__code__.co_consts
+def test_check_result_never_has_blank_card_fields():
+ from app.models import CheckResult
+ finding=CheckResult(title=' ',category='Email protection',status='warning',severity='medium',plainEnglishSummary='',whyItMatters='',recommended_action='',evidence=None)
+ assert finding.title == 'Security check'
+ assert finding.whyItMatters
+ assert finding.recommendedAction
+ assert finding.evidence == []
