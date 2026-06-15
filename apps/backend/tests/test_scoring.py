@@ -1,7 +1,7 @@
 from app.models import CheckResult
 from app.scoring import calculate_score, grade, main_risk_summary
 
-def check(status,name='x'): return CheckResult(category='x',name=name,status=status,message='x')
+def check(status,name='x'): return CheckResult(category='x',title=name,status=status,severity='medium',plainEnglishSummary='x',whyItMatters='x',recommendedFix='x')
 def test_scoring(): assert calculate_score([check('pass'),check('warning'),check('fail'),check('needs_review')]) == 56
 def test_empty_score(): assert calculate_score([]) == 0
 def test_grades(): assert [grade(x) for x in (90,70,50,20)] == ['Strong','Good','At risk','Critical']
