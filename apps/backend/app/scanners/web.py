@@ -2,8 +2,10 @@ import asyncio, socket, ssl
 from datetime import datetime, timezone
 import httpx
 from ..models import CheckResult
+
 HEADERS={'strict-transport-security','content-security-policy','x-content-type-options','x-frame-options','referrer-policy'}
 ADMIN_PATHS=('/admin','/wp-admin','/administrator')
+
 async def ssl_days(domain: str) -> int | None:
     def inspect():
         try:
@@ -14,13 +16,30 @@ async def ssl_days(domain: str) -> int | None:
             return (expires-datetime.now(timezone.utc)).days
         except (OSError,ssl.SSLError,KeyError,ValueError): return None
     return await asyncio.to_thread(inspect)
+
+def ssl_result(days: int | None) -> CheckResult:
+    if days is None: status,message='needs_review','We could not confirm the SSL certificate expiry date. Ask your website provider to check it.'
+    elif days < 0: status,message='fail',f'The SSL certificate expired {-days} days ago. Renew it immediately.'
+    elif days < 30: status,message='warning',f'The SSL certificate expires in {days} days. Renew it as a high priority.'
+    elif days <= 60: status,message='warning',f'The SSL certificate expires in {days} days. Plan its renewal soon.'
+    else: status,message='pass',f'The SSL certificate is valid for another {days} days.'
+    return CheckResult(category='Website security',name='SSL certificate expiry',status=status,message=message,details={'days_remaining':days})
+
 async def scan_web(domain: str) -> list[CheckResult]:
     async with httpx.AsyncClient(timeout=8,follow_redirects=True) as client:
         try: response=await client.get(f'https://{domain}')
         except httpx.HTTPError: response=None
-        async def exposed(path):
-            try: return (path,(await client.get(f'https://{domain}{path}')).status_code in (200,401,403))
-            except httpx.HTTPError: return (path,False)
-        paths=await asyncio.gather(*(exposed(p) for p in ADMIN_PATHS))
-    days=await ssl_days(domain); missing=sorted(HEADERS-set(k.lower() for k in response.headers)) if response else sorted(HEADERS); found=[p for p,v in paths if v]
-    return [CheckResult(category='Website security',name='HTTPS connection',status='pass' if response else 'fail',message='Your website is reachable securely.' if response else 'Make sure your website is available over HTTPS.'),CheckResult(category='Website security',name='SSL certificate expiry',status='pass' if days is not None and days>=30 else ('warning' if days is not None else 'fail'),message=f'Certificate expires in {days} days.' if days is not None else 'We could not verify a valid SSL certificate.',details={'days_remaining':days}),CheckResult(category='Website security',name='Security headers',status='pass' if not missing else 'warning',message='Recommended browser security headers are present.' if not missing else 'Ask your web provider to add missing browser security headers.',details={'missing':missing}),CheckResult(category='Website security',name='Common admin paths',status='warning' if found else 'pass',message='Restrict and protect exposed admin login pages.' if found else 'No common admin paths were exposed.',details={'exposed':found}),CheckResult(category='Website security',name='HTTP status',status='pass' if response and response.status_code<400 else 'fail',message=f'Website returned HTTP {response.status_code}.' if response else 'Website did not respond.')]
+        async def inspect_path(path):
+            try: return {'path':path,'status_code':(await client.get(f'https://{domain}{path}')).status_code}
+            except httpx.HTTPError: return {'path':path,'status_code':None}
+        paths=await asyncio.gather(*(inspect_path(p) for p in ADMIN_PATHS))
+    days=await ssl_days(domain); missing=sorted(HEADERS-set(k.lower() for k in response.headers)) if response else sorted(HEADERS)
+    exposed=[x['path'] for x in paths if x['status_code'] in (200,401,403)]
+    http_status='needs_review' if response and response.status_code==403 else ('pass' if response and response.status_code<400 else 'fail')
+    http_message='The website returned HTTP 403. It may be safely blocking scanners, so a person should confirm the site works.' if http_status=='needs_review' else (f'The website responded normally with HTTP {response.status_code}.' if http_status=='pass' else 'The website did not respond normally. Ask your website provider to investigate.')
+    return [
+      CheckResult(category='Website security',name='HTTPS connection',status='pass' if response else 'fail',message='The website uses an encrypted HTTPS connection.' if response else 'The website could not be reached securely over HTTPS.'),
+      ssl_result(days),
+      CheckResult(category='Website security',name='Security headers',status='pass' if not missing else 'warning',message='Recommended browser protections are in place.' if not missing else 'Ask your website provider to add the missing browser protections.',details={'missing':missing}),
+      CheckResult(category='Website security',name='Common admin paths',status='warning' if exposed else 'pass',message='Common admin pages may be reachable. Protect them with strong passwords and multi-factor authentication.' if exposed else 'No common admin pages appeared to be exposed.',details={'paths_checked':paths,'exposed':exposed}),
+      CheckResult(category='Website security',name='HTTP status',status=http_status,message=http_message,details={'status_code':response.status_code if response else None})]

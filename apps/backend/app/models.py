@@ -1,5 +1,8 @@
 from typing import Literal
 from pydantic import BaseModel, Field, field_validator
+
+Status = Literal['pass', 'warning', 'fail', 'info', 'needs_review']
+
 class ScanRequest(BaseModel):
     domain: str = Field(min_length=3, max_length=253)
     @field_validator('domain')
@@ -8,7 +11,9 @@ class ScanRequest(BaseModel):
         value=value.strip().lower().removeprefix('https://').removeprefix('http://').split('/')[0].split(':')[0].rstrip('.')
         if '.' not in value or ' ' in value: raise ValueError('Enter a valid domain name')
         return value
+
 class CheckResult(BaseModel):
-    category: str; name: str; status: Literal['pass','warning','fail']; message: str; details: dict = {}
+    category: str; name: str; status: Status; message: str; details: dict = {}
+
 class ScanResponse(BaseModel):
-    domain: str; score: int; grade: str; checks: list[CheckResult]
+    domain: str; score: int; grade: str; main_risk_summary: str; checks: list[CheckResult]
