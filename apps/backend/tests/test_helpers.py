@@ -24,7 +24,10 @@ async def test_mx_records_found(monkeypatch): assert (await dns_results(monkeypa
 def test_ssl_expiring_in_32_days(): assert web.ssl_result(32).status == 'warning'
 
 def test_http_403_wording():
-    assert 403 in web.scan_web.__code__.co_consts
+    import httpx
+    result = web.build_http_status_finding(httpx.Response(403))
+    assert result.status == 'needs_review'
+    assert 'blocks automated scanners' in result.plainEnglishSummary
 def test_check_result_never_has_blank_card_fields():
  from app.models import CheckResult
  finding=CheckResult(title=' ',category='Email protection',status='warning',severity='medium',plainEnglishSummary='',whyItMatters='',recommended_action='',evidence=None)
