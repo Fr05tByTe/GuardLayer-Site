@@ -13,8 +13,8 @@ def grade(score: int) -> str:
     return 'Critical'
 
 def main_risk_summary(checks: list[CheckResult]) -> str:
-    dmarc=next((c for c in checks if c.name=='DMARC policy' and c.status in ('fail','warning')),None)
+    dmarc=next((c for c in checks if c.title=='DMARC policy' and c.status in ('fail','warning')),None)
     if dmarc: return 'Your biggest risk is email impersonation because DMARC is missing or not enforced.'
     priority=next((c for status in ('fail','warning','needs_review') for c in checks if c.status==status),None)
-    if priority: return f'Your biggest area to address is {priority.name.lower()}. {priority.message}'
+    if priority: return f'Your biggest area to address is {priority.title.lower()}. {priority.plainEnglishSummary}'
     return 'No major public-facing risks were found. Keep monitoring your website and email security.'

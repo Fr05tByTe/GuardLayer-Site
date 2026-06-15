@@ -24,5 +24,4 @@ async def test_mx_records_found(monkeypatch): assert (await dns_results(monkeypa
 def test_ssl_expiring_in_32_days(): assert web.ssl_result(32).status == 'warning'
 
 def test_http_403_wording():
-    # HTTP status classification is covered through its explicit business rule in scan_web.
-    assert '403' in web.scan_web.__code__.co_consts
+    assert 403 in web.scan_web.__code__.co_consts
